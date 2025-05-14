@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    </head>
+    <body>
+        <div>
+            <button id="start-call-btn">Start Call</button>
+            <button id="end-call-btn" style="display: none">End Call</button>
+        </div>
+
+        <script src="../dist/webphone.iife.js"></script>
+        <script>
+            const remoteAudioElement = document.createElement("audio");
+            document.body.appendChild(remoteAudioElement);
+
+            const startCallBtn = document.getElementById("start-call-btn");
+            const endCallBtn = document.getElementById("end-call-btn");
+
+            const phone = new Phone.WebPhone({
+                mediaConfig: {
+                    remoteAudioElement: remoteAudioElement,
+                    eventSubscription: {
+                        onConnectionEvent: (e) => {
+                            console.log("connection event");
+                            console.log(e);
+                        },
+                        onCallEvent: (e) => {
+                            console.log("call event");
+                            console.log(e);
+                        },
+                    },
+                },
+            });
+
+            let timeout = null;
+
+            startCallBtn.addEventListener("click", async () => {
+                startCallBtn.style.display = "none";
+                endCallBtn.innerText = "Setting up...";
+                endCallBtn.style.display = "inline-block";
+
+                try {
+                    await startCall();
+                } catch (error) {
+                    console.log(error);
+                    endCallBtn.click();
+                    return;
+                }
+                endCallBtn.innerText = "Connecting...";
+                timeout = setTimeout(() => {
+                    endCallBtn.innerText = "End Call";
+                }, 2000);
+            });
+
+            endCallBtn.addEventListener("click", async () => {
+                clearTimeout(timeout);
+                endCallBtn.innerText = "End Call";
+                await endCall();
+                startCallBtn.style.display = "inline-block";
+                endCallBtn.style.display = "none";
+            });
+
+            async function startCall() {
+                await phone.register({
+                    server: {
+                        host: "demoserver.xyz.com",
+                        port: 7443,
+                        iceServers: [
+                            {
+                                urls: "turn:127.0.0.1:3478",
+                                username: "bob",
+                                credential: "rjghr23fj",
+                            },
+                        ],
+                    },
+                    user: {
+                        name: "1002",
+                        password: "eggeeg2f2e",
+                    },
+                });
+
+                if (phone.calls.length == 0) {
+                    await phone.makeCall("7003", { audio: remoteAudioElement, video: undefined });
+                }
+            }
+
+            async function endCall() {
+                if (phone.calls) {
+                    for (const call of phone.calls) {
+                        await phone.hangupCall(call);
+                    }
+                }
+            }
+        </script>
+    </body>
+</html>
