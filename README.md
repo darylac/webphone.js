@@ -1,6 +1,6 @@
 ## Webphone.js
 
-WebPhone library helps you build soft phones for the web.
+WebPhone library is used to build soft phone for the web.
 
 It uses SIP over websocket for signalling and WebRTC for media transmission.
 
@@ -187,3 +187,6 @@ Possible values are
  - hangup: when the call hangs up
  */
 ```
+
+### Framework Integration
+For integrating with frameworks like React, Angular, Svelte or others refer to the svelte example in the `examples` folder. The README in the `examples/svelte` explains the steps to integrate, which will give general idea on how to do it for the rest of the frameworks.
